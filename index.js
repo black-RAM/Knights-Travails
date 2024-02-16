@@ -35,6 +35,30 @@ function moveFinder(start) {
   return valid
 }
 
+function pathFinder(graph, end, currentPath = []) {
+  // DFS to return an array of sets of fastest paths
+  const lastVertex = currentPath[currentPath.length - 1]
+
+  if (lastVertex.toString() === end.toString()) {
+    currentPath = new Set(currentPath)
+    return [currentPath]
+  }
+
+  const paths = []
+
+  if(graph[lastVertex]) {
+    for (const adjacent of graph[lastVertex]) {
+      if (!currentPath.some(vertex => vertex.toString() === adjacent.toString())) {
+        const newPath = currentPath.concat([adjacent])
+        const subPaths = pathFinder(graph, end, newPath)
+        paths.push(...subPaths)
+      }
+    }
+  }
+
+  return paths
+}
+
 function knightMoves(start, end) {
   // BFS to generate directed graph
   const graph = {}
@@ -45,21 +69,25 @@ function knightMoves(start, end) {
 
     // prevent duplicate
     if(graph[vertex]) continue
-    
+
     // stringification prevents comparison by memory reference 
     if(vertex.toString() == end.toString()) break
 
     // add vertex to graph
     graph[vertex] = []
-    
+
     for (const move of moveFinder(vertex)) {
       graph[vertex].push(move)
       queue.push(move)     
     }
   }
 
-  return graph
+  return pathFinder(graph, end, [start])
 }
 
-const moves = knightMoves([0, 0], [2, 1])
-console.log(moves)
+const moves = knightMoves([0, 0], [3, 3])
+console.log(moves) // console outputs:
+// [
+//   Set(3) { [ 0, 0 ], [ 1, 2 ], [ 3, 3 ] },
+//   Set(3) { [ 0, 0 ], [ 2, 1 ], [ 3, 3 ] }
+// ]
