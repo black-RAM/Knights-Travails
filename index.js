@@ -1,4 +1,4 @@
-function knightMoves(start) {
+function moveFinder(start) {
   // generate all possible knight moves
   // read variable names as semi-cardinal compass directions
   // eg, nne means North of North East
@@ -35,5 +35,31 @@ function knightMoves(start) {
   return valid
 }
 
-const moves = knightMoves([0, 0])
+function knightMoves(start, end) {
+  // BFS to generate directed graph
+  const graph = {}
+  const queue = [start]
+
+  while(queue.length > 0) {
+    const vertex = queue.shift()
+
+    // prevent duplicate
+    if(graph[vertex]) continue
+    
+    // stringification prevents comparison by memory reference 
+    if(vertex.toString() == end.toString()) break
+
+    // add vertex to graph
+    graph[vertex] = []
+    
+    for (const move of moveFinder(vertex)) {
+      graph[vertex].push(move)
+      queue.push(move)     
+    }
+  }
+
+  return graph
+}
+
+const moves = knightMoves([0, 0], [2, 1])
 console.log(moves)
